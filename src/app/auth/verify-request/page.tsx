@@ -8,8 +8,8 @@ export default function Page() {
 		<main>
 			<section>
 				<div className='max-w-7xl mx-auto flex items-center justify-center min-h-dvh'>
-					<div className='max-w-xl w-full px-6 py-6 rounded-lg'>
-						<h2 className='text-2xl font-medium text-center uppercase'>Verification Token Sent</h2>
+					<div className='max-w-xl w-full px-6 py-6 rounded-lg bg-muted border -translate-y-1/4'>
+						<h2 className='text-2xl font-medium text-center uppercase'>Verification Link Sent</h2>
 						<div className='text-center py-4'>
 							<Button className='mx-auto rounded-full gap-3' variant='outline' asChild>
 								<Link href={'/auth/signin'} className='text-xs'>
@@ -28,4 +28,3 @@ export default function Page() {
 		</main>
 	);
 }
-// A verification link has been send to your email address
