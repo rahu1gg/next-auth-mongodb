@@ -12,9 +12,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ROLES } from '@/constants/auth';
+import { ROLES, Role } from '@/constants/auth';
 import { genetateUserName } from '@/lib/utils/generate-username';
-import { FileBarChart2, GraduationCap, LayoutDashboard, LogOut, Users } from 'lucide-react';
+import { LayoutDashboard, LogOut, Users } from 'lucide-react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -36,7 +36,16 @@ export function HeaderAuth() {
 }
 
 function UserProfile() {
+	const [loading, setLoading] = useState(false);
+	const router = useRouter();
 	const { data: session, status } = useSession();
+
+	async function handleSignout() {
+		setLoading(true);
+		await signOut();
+		setLoading(false);
+		router.replace('/');
+	}
 
 	if (status === 'authenticated' && session)
 		return (
@@ -70,13 +79,28 @@ function UserProfile() {
 									/>
 								</div>
 								<div>
-									<p className='font-medium text-sm'>{session.user.name}</p>
+									<p className='font-medium text-sm'>
+										{session.user.name} ·{' '}
+										<span className='font-normal'>{Object.entries(ROLES).find((val) => val[1] === session.user.role && val[0])![0]}</span>
+									</p>
 									<p className='text-muted-foreground text-[13px]'>{session.user.email}</p>
 								</div>
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuGroup>
 							<NavAuthLinks />
+							<DropdownMenuItem
+								className='focus:bg-red-100 w-full hover:cursor-pointer px-6 py-3.5 rounded-none text-black-1050'
+								onClick={(e) => e.preventDefault()}
+								asChild
+							>
+								<button type='button' className='gap-4' onClick={handleSignout} disabled={loading}>
+									<span className='flex items-stretch justify-center basis-11'>
+										{loading ? <CircularLoader className='h-5' /> : <LogOut className='text-grey-1050' size={16} strokeWidth={2.25} />}
+									</span>
+									<span>Sign out</span>
+								</button>
+							</DropdownMenuItem>
 						</DropdownMenuGroup>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -86,50 +110,48 @@ function UserProfile() {
 	return <Button onClick={() => signIn()}>Signin</Button>;
 }
 
-export const HEADER_AUTH = [
+export const AUTHORIZED_ROUTES = [
 	{
 		id: 1,
 		label: 'Dashboard',
-		href: '/dashboard/results',
+		href: '/admin/dashboard',
 		icon: LayoutDashboard,
 	},
+] as const;
+const SUPERADMIN_ROUTES = [
 	{
-		id: 2,
-		label: 'Upload Result',
-		href: '/dashboard/result/upload',
-		icon: FileBarChart2,
-	},
-	{
-		id: 3,
-		label: 'Upload Students',
-		href: '/dashboard/result/upload',
-		icon: GraduationCap,
-	},
-	{
-		id: 4,
-		label: 'Manage Roles',
-		href: '/dashboard/roles',
+		id: 100,
+		label: 'Manage roles',
+		href: '/superadmin/manage-roles',
 		icon: Users,
 	},
 ] as const;
 
-function NavAuthLinks() {
-	const [loading, setLoading] = useState(false);
-	const { data: session } = useSession();
-	const router = useRouter();
+const AUTHORIZED_USERS = [ROLES.superadmin, ROLES.admin] as Role[];
+const SUPERADMIN_USERS = [ROLES.superadmin] as Role[];
 
-	async function handleSignout() {
-		setLoading(true);
-		await signOut();
-		setLoading(false);
-		router.replace('/');
-	}
+function NavAuthLinks() {
+	const { data: session } = useSession();
 
 	return (
 		<Fragment>
-			{session?.user.role === ROLES.admin && (
+			{session?.user && AUTHORIZED_USERS.includes(session?.user.role) && (
 				<Fragment>
-					{HEADER_AUTH.map((link) => (
+					{AUTHORIZED_ROUTES.map((link) => (
+						<DropdownMenuItem key={link.id} className='px-6 py-3.5 rounded-none text-black-1050' asChild>
+							<Link href={link.href} className='hover:cursor-pointer flex justify-start items-center gap-4'>
+								<span className='flex items-stretch justify-center basis-11'>
+									{<link.icon className='text-grey-1050' size={16} strokeWidth={2.25} />}
+								</span>
+								<span>{link.label}</span>
+							</Link>
+						</DropdownMenuItem>
+					))}
+				</Fragment>
+			)}
+			{session?.user && SUPERADMIN_USERS.includes(session?.user.role) && (
+				<Fragment>
+					{SUPERADMIN_ROUTES.map((link) => (
 						<DropdownMenuItem key={link.id} className='px-6 py-3.5 rounded-none text-black-1050' asChild>
 							<Link href={link.href} className='hover:cursor-pointer flex justify-start items-center gap-4'>
 								<span className='flex items-stretch justify-center basis-11'>
@@ -142,18 +164,7 @@ function NavAuthLinks() {
 					<DropdownMenuSeparator />
 				</Fragment>
 			)}
-			<DropdownMenuItem
-				className='focus:bg-red-100 w-full hover:cursor-pointer px-6 py-3.5 rounded-none text-black-1050'
-				onClick={(e) => e.preventDefault()}
-				asChild
-			>
-				<button type='button' className='gap-4' onClick={handleSignout} disabled={loading}>
-					<span className='flex items-stretch justify-center basis-11'>
-						{loading ? <CircularLoader className='h-5' /> : <LogOut className='text-grey-1050' size={16} strokeWidth={2.25} />}
-					</span>
-					<span>Sign out</span>
-				</button>
-			</DropdownMenuItem>
+			{session?.user.role === ROLES.admin && <DropdownMenuSeparator />}
 		</Fragment>
 	);
 }

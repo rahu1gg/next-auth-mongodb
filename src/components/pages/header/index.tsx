@@ -9,12 +9,12 @@ const NAV_LINKS = [
 	},
 	{
 		id: 2,
-		label: 'Profile',
+		label: 'Profile(client)',
 		href: '/profile/client',
 	},
 	{
 		id: 3,
-		label: 'Profile',
+		label: 'Profile(server)',
 		href: '/profile/server',
 	},
 ];
@@ -35,8 +35,10 @@ export default function Header() {
 								</Link>
 							</li>
 						))}
+						<li className='pl-5'>
+							<HeaderAuth />
+						</li>
 					</ul>
-					<HeaderAuth />
 				</nav>
 			</div>
 		</header>
