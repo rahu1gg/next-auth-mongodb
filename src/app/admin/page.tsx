@@ -1,10 +1,9 @@
-export default function Home() {
+export default function Page() {
 	return (
 		<main>
 			<section>
 				<div className='max-w-7xl mx-auto'>
-					<h2>Home</h2>
-					<p>Public Route</p>
+					<h2>Admin Page</h2>
 				</div>
 			</section>
 		</main>
