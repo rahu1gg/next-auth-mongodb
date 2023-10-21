@@ -1,17 +1,14 @@
-'use client';
-
-import { useSession } from 'next-auth/react';
+import { ClientProfile } from '@/components/pages/profile/client';
 
 export default function Page() {
-	const { data: session } = useSession();
-	console.log(session);
-
 	return (
 		<main>
 			<section>
-				<div className='max-w-7xl mx-auto'>
-					<h2>Client Profile</h2>
-					<p>profile</p>
+				<div className='max-w-7xl py-5 mx-auto'>
+					<div>
+						<h2 className='text-3xl font-semibold'>Client Profile</h2>
+					</div>
+					<ClientProfile />
 				</div>
 			</section>
 		</main>
