@@ -5,7 +5,7 @@ export const ROLES = {
 	admin: 120,
 	superadmin: 148,
 } as const;
-export type Roles = typeof ROLES[keyof typeof ROLES];
+export type Role = typeof ROLES[keyof typeof ROLES];
 
 export const AUTH_PAGES = {
 	signIn: '/auth/signin',
