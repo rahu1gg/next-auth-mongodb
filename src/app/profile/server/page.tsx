@@ -1,5 +1,10 @@
 import ServerProfile from '@/components/pages/profile';
+import { Metadata } from 'next';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+	title: 'Next-auth mongoDB - Profile(server)',
+};
 
 export default function Page() {
 	return (

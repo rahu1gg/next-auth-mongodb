@@ -1,4 +1,9 @@
 import { ClientProfile } from '@/components/pages/profile/client';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+	title: 'Next-auth mongoDB - Profile(client)',
+};
 
 export default function Page() {
 	return (

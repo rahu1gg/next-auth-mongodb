@@ -1,7 +1,12 @@
 import VerifyRequest from '@/components/pages/auth/verify-request';
 import { Button } from '@/components/ui/button';
 import { PencilLine } from 'lucide-react';
+import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+	title: 'Next-auth mongoDB - Verify request',
+};
 
 export default function Page() {
 	return (

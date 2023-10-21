@@ -1,6 +1,11 @@
 import EmailSignin from '@/components/pages/auth/email-signin';
 import OAuthSignin from '@/components/pages/auth/oauth-signin';
+import { Metadata } from 'next';
 import { getProviders } from 'next-auth/react';
+
+export const metadata: Metadata = {
+	title: 'Next-auth mongoDB - Signin',
+};
 
 export default async function Page() {
 	const providers = (await getProviders()) ?? [];

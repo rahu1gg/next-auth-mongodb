@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Next-auth mongoDB - Manage roles 🍁',
+	title: 'Next-auth mongoDB - Manage roles',
 };
 
 export default function ManageRoles() {
