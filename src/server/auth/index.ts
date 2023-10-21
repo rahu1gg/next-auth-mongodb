@@ -1,11 +1,15 @@
+import VerificationRequest from '@/components/custom/emails/verification-request';
 import { AUTH_PAGES, ROLES } from '@/constants/auth';
+import { transporter } from '@/lib/services/nodemailer';
 import { MongoDBAdapter } from '@auth/mongodb-adapter';
+import { render } from '@react-email/components';
 import NextAuth, { getServerSession, type NextAuthOptions } from 'next-auth';
 import { type Adapter } from 'next-auth/adapters';
 import EmailProvider from 'next-auth/providers/email';
 import GitHubProvider, { type GithubProfile } from 'next-auth/providers/github';
 import GoogleProvider, { type GoogleProfile } from 'next-auth/providers/google';
-import clientPromise, { client } from '../db';
+import { Options } from 'nodemailer/lib/mailer';
+import clientPromise, { client } from './auth-db';
 
 export const authOptions: NextAuthOptions = {
 	adapter: MongoDBAdapter(clientPromise) as Adapter,
@@ -20,6 +24,26 @@ export const authOptions: NextAuthOptions = {
 				},
 			},
 			from: process.env.EMAIL_FROM,
+			async sendVerificationRequest({ identifier, url, provider }) {
+				const { host } = new URL(url);
+
+				const options: Options = {
+					to: identifier,
+					from: {
+						name: 'Next-auth mongoDB',
+						address: provider.from,
+					},
+					subject: 'Signin to Next-auth mongoDB',
+					text: `Signin to ${host}\n${url}\n\n`,
+					html: render(VerificationRequest({ email: identifier, signinLink: url })),
+				};
+
+				const result = await transporter.sendMail(options);
+				const failed = result.rejected.concat(result.pending).filter(Boolean);
+				if (failed.length) {
+					throw new Error(`Email(s) (${failed.join(', ')}) could not be sent`);
+				}
+			},
 		}),
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID,
@@ -66,7 +90,7 @@ export const authOptions: NextAuthOptions = {
 	},
 	events: {
 		async signIn({ account, user, isNewUser }) {
-			// Check if the user authenticated for the first-time via EmailProvider to assing role
+			// Check if the user authenticated for the first-time via EmailProvider to assign role
 			if (isNewUser && account?.type === 'email') {
 				try {
 					await client.connect();
